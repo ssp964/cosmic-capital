@@ -17,7 +17,7 @@ export function NavbarDemo() {
   const navItems = [
     {
       name: "Home",
-      link: "#Home",
+      link: "/",
     },
     {
       name: "Dashboard",

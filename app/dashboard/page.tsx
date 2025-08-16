@@ -6,151 +6,162 @@ import {
   CheckCircle,
   DollarSign,
   Zap,
-  TrendingUp,
-  Clock,
   Users,
+  RefreshCw,
 } from "lucide-react";
+import Footer from "@/app/components/Footer";
 import { NavbarDemo } from "../components/Navbar";
-import Footer from "../components/Footer";
 
 const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  // Real CDP data from The Graph
-  const rawCdpData = {
-    data: {
-      cdps: [
-        {
-          id: "0x1648c14dbb6ccdd5846969ce23deec4c66a03335",
-          owner: "0x1648c14dbb6ccdd5846969ce23deec4c66a03335",
-          collateral: "0",
-          debt: "60173274255398100463",
-          healthFactor:
-            "115792089237316195423570985008687900000000000000000000000000000000000000000000",
-        },
-        {
-          id: "0x19c569184f60913daea2bd9409c12b031d06778f",
-          owner: "0x19c569184f60913daea2bd9409c12b031d06778f",
-          collateral: "0",
-          debt: "25903",
-          healthFactor: "1300003084051916265",
-        },
-        {
-          id: "0x3a79e8539a19aaac21a0bda36f4613aae856a4f4",
-          owner: "0x3a79e8539a19aaac21a0bda36f4613aae856a4f4",
-          collateral: "0",
-          debt: "2000",
-          healthFactor: "27919746391913504004",
-        },
-        {
-          id: "0x586a60f8dd53032425ada3b60d08d5ac28eb77db",
-          owner: "0x586a60f8dd53032425ada3b60d08d5ac28eb77db",
-          collateral: "0",
-          debt: "2000000000000000",
-          healthFactor: "5685279753434877938",
-        },
-        {
-          id: "0x6c1549d623d891aeb2d99c049eff44680f9bdf83",
-          owner: "0x6c1549d623d891aeb2d99c049eff44680f9bdf83",
-          collateral: "0",
-          debt: "110000",
-          healthFactor: "521521542441346864271",
-        },
-        {
-          id: "0x9c17eda79127cd6a370732d62f059adc87dc5d2d",
-          owner: "0x9c17eda79127cd6a370732d62f059adc87dc5d2d",
-          collateral: "0",
-          debt: "10000000",
-          healthFactor: "3537502400150968890",
-        },
-        {
-          id: "0xa658e94bc3de686aaa5096414013ceec49b5900b",
-          owner: "0xa658e94bc3de686aaa5096414013ceec49b5900b",
-          collateral: "0",
-          debt: "6000000000023675656",
-          healthFactor: "1408540724460432427",
-        },
-        {
-          id: "0xe72ca9163148c6a7d101b21c942584689ed83f05",
-          owner: "0xe72ca9163148c6a7d101b21c942584689ed83f05",
-          collateral: "0",
-          debt: "117089995",
-          healthFactor: "2596637348625969337",
-        },
-        {
-          id: "0xe9fa4f143f073fd5017daa03b5863bb3966dcce4",
-          owner: "0xe9fa4f143f073fd5017daa03b5863bb3966dcce4",
-          collateral: "0",
-          debt: "120000000",
-          healthFactor: "1588453630228487397",
-        },
-      ],
-    },
-  };
+  // GraphQL query for CDP data
+  const CDPS_QUERY = `
+    {
+      cdps {
+        id
+        owner
+        collateral
+        debt
+        healthFactor
+      }
+    }
+  `;
 
-  // Helper functions to process the raw data
-  const formatAddress = (address) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+  const GRAPH_API_URL =
+    "https://api.studio.thegraph.com/query/118849/cosmic-capital/v0.1.4";
 
-  const formatDebt = (debt) => {
-    const debtNum = parseFloat(debt);
-    if (debtNum < 1000) return debtNum.toString();
-    if (debtNum < 1000000) return (debtNum / 1000).toFixed(1) + "K";
-    if (debtNum < 1000000000) return (debtNum / 1000000).toFixed(1) + "M";
-    return (debtNum / 1000000000).toFixed(1) + "B";
-  };
-
-  const normalizeHealthFactor = (hf) => {
-    const hfNum = parseFloat(hf);
-    // Handle extremely large numbers (likely representing infinity/max safe values)
-    if (hfNum > 1e50) return 999.99; // Cap at 999.99 for display
-    // Convert from wei-like format to decimal
-    return hfNum / 1e18;
-  };
-
-  const getStatusFromHealthFactor = (hf) => {
-    if (hf < 1.0) return "liquidation";
-    if (hf < 1.2) return "at-risk";
-    return "healthy";
-  };
-
-  // Process the raw CDP data
-  const processedLoans = rawCdpData.data.cdps.map((cdp) => {
-    const normalizedHF = normalizeHealthFactor(cdp.healthFactor);
-    return {
-      id: cdp.id,
-      borrower: formatAddress(cdp.owner),
-      collateral: { amount: parseFloat(cdp.collateral) / 1e18, type: "ETH" }, // Assuming ETH collateral
-      borrowed: { amount: formatDebt(cdp.debt), type: "DAI" }, // Assuming DAI debt based on CDP structure
-      healthFactor: normalizedHF,
-      status: getStatusFromHealthFactor(normalizedHF),
-      rawDebt: parseFloat(cdp.debt),
-    };
-  });
-
-  const [loans, setLoans] = useState(processedLoans);
-
-  // Calculate system stats from real data
-  const totalLoans = loans.length;
-  const atRiskLoans = loans.filter((loan) => loan.healthFactor < 1.2).length;
-  const totalDebt = loans.reduce((sum, loan) => sum + loan.rawDebt, 0);
-  const totalCollateralValue = loans.reduce(
-    (sum, loan) => sum + loan.collateral.amount * 2000,
-    0
-  ); // Assuming ETH = $2000
-
+  // Initialize with empty loans array and system stats
+  const [loans, setLoans] = useState([]);
   const [systemStats, setSystemStats] = useState({
-    totalLoans,
-    atRiskLoans,
-    todayLiquidations: 3, // This would come from liquidation events
-    gasSaved: 120.45, // This would be calculated from your Hedera vs Ethereum comparison
-    totalCollateral: totalCollateralValue,
-    totalBorrowed: totalDebt / 1e18, // Convert from wei
-    weeklyLiquidations: 18, // This would come from historical data
+    totalLoans: 0,
+    atRiskLoans: 0,
+    liquidationLoans: 0,
+    todayLiquidations: 3, // Mock
+    gasSaved: 120.45, // Mock
+    totalCollateral: 0,
+    totalBorrowed: 0,
+    weeklyLiquidations: 18, // Mock
   });
 
-  const [liquidationHistory, setLiquidationHistory] = useState([
+  // Fetch CDP data from The Graph
+  const fetchCdpData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(GRAPH_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: CDPS_QUERY }),
+      });
+
+      const json = await response.json();
+
+      if (json.errors) {
+        console.error("GraphQL errors:", json.errors);
+        return;
+      }
+
+      if (json.data?.cdps) {
+        const processedLoans = json.data.cdps.map((cdp) => {
+          const normalizedHF = normalizeHealthFactor(cdp.healthFactor);
+          return {
+            id: cdp.id,
+            borrower: formatAddress(cdp.owner),
+            fullAddress: cdp.owner,
+            collateral: {
+              amount: parseFloat(cdp.collateral) / 1e18,
+              type: "ETH",
+            },
+            borrowed: { amount: formatDebt(cdp.debt), type: "DAI" },
+            healthFactor: normalizedHF,
+            status: getStatusFromHealthFactor(normalizedHF),
+            rawDebt: parseFloat(cdp.debt),
+            rawCollateral: parseFloat(cdp.collateral),
+          };
+        });
+
+        setLoans(processedLoans);
+        updateSystemStats(processedLoans);
+        setLastUpdated(new Date());
+      }
+    } catch (error) {
+      console.error("Error fetching CDP data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update system stats based on fetched data
+  const updateSystemStats = (loansData) => {
+    const totalLoans = loansData.length;
+    const atRiskLoans = loansData.filter(
+      (loan) => loan.healthFactor < 1.2 && loan.healthFactor > 0
+    ).length;
+    const liquidationLoans = loansData.filter(
+      (loan) => loan.healthFactor < 1.0
+    ).length;
+    const totalDebt = loansData.reduce((sum, loan) => sum + loan.rawDebt, 0);
+    const totalCollateralValue = loansData.reduce(
+      (sum, loan) => sum + loan.collateral.amount * 2000,
+      0
+    );
+
+    setSystemStats((prev) => ({
+      ...prev,
+      totalLoans,
+      atRiskLoans,
+      liquidationLoans,
+      totalCollateral: totalCollateralValue,
+      totalBorrowed: totalDebt / 1e18,
+    }));
+  };
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    fetchCdpData();
+    const interval = setInterval(() => {
+      fetchCdpData();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Manual refresh
+  const handleRefresh = () => {
+    fetchCdpData();
+  };
+
+  // Clock updater
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Mock cross-chain status
+  const [crossChainStatus] = useState([
+    {
+      id: 1,
+      message: "Liquidate 0xabc123",
+      status: "confirmed",
+      timestamp: "14:32",
+    },
+    {
+      id: 2,
+      message: "Liquidate 0xdef456",
+      status: "confirmed",
+      timestamp: "14:35",
+    },
+    {
+      id: 3,
+      message: "Liquidate 0xghi789",
+      status: "pending",
+      timestamp: "15:20",
+    },
+  ]);
+
+  // Mock liquidation history
+  const [liquidationHistory] = useState([
     {
       id: 1,
       borrower: "0xabc123...def456",
@@ -180,43 +191,31 @@ const Dashboard = () => {
     },
   ]);
 
-  const [crossChainStatus, setCrossChainStatus] = useState([
-    {
-      id: 1,
-      message: "Liquidate 0xabc123",
-      status: "confirmed",
-      timestamp: "14:32",
-    },
-    {
-      id: 2,
-      message: "Liquidate 0xdef456",
-      status: "confirmed",
-      timestamp: "14:35",
-    },
-    {
-      id: 3,
-      message: "Liquidate 0xghi789",
-      status: "pending",
-      timestamp: "15:20",
-    },
-  ]);
+  // Helper functions
+  const formatAddress = (address) =>
+    `${address.slice(0, 6)}...${address.slice(-4)}`;
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const formatDebt = (debt) => {
+    const debtNum = parseFloat(debt);
+    if (debtNum === 0) return "0";
+    if (debtNum < 1000) return debtNum.toString();
+    if (debtNum < 1000000) return (debtNum / 1000).toFixed(1) + "K";
+    if (debtNum < 1000000000) return (debtNum / 1000000).toFixed(1) + "M";
+    return (debtNum / 1000000000).toFixed(1) + "B";
+  };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "healthy":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "at-risk":
-        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
-      case "liquidation":
-        return <Zap className="w-4 h-4 text-red-500" />;
-      default:
-        return null;
-    }
+  const normalizeHealthFactor = (hf) => {
+    const hfNum = parseFloat(hf);
+    if (hfNum === 0) return 0;
+    if (hfNum > 1e50) return 999.99; // Cap at 999.99
+    return hfNum / 1e18;
+  };
+
+  const getStatusFromHealthFactor = (hf) => {
+    if (hf === 0) return "closed";
+    if (hf < 1.0) return "liquidation";
+    if (hf < 1.2) return "at-risk";
+    return "healthy";
   };
 
   const getStatusColor = (status) => {
@@ -227,8 +226,25 @@ const Dashboard = () => {
         return "text-yellow-600 bg-yellow-50 border-yellow-200";
       case "liquidation":
         return "text-red-600 bg-red-50 border-red-200";
+      case "closed":
+        return "text-gray-600 bg-gray-50 border-gray-200";
       default:
         return "text-gray-600 bg-gray-50 border-gray-200";
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "healthy":
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "at-risk":
+        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+      case "liquidation":
+        return <Zap className="w-4 h-4 text-red-500" />;
+      case "closed":
+        return <div className="w-4 h-4 rounded-full bg-gray-400" />;
+      default:
+        return null;
     }
   };
 
@@ -242,12 +258,8 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 mt-2">
-          {" "}
-          <NavbarDemo></NavbarDemo>
-        </div>
-
-        <div className="mb-8">
+        <NavbarDemo></NavbarDemo>
+        <div className="mb-8 mt-4">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
@@ -259,9 +271,19 @@ const Dashboard = () => {
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-500">Last Update</div>
-              <div className="font-mono text-lg">
-                {currentTime.toLocaleTimeString()}
+              <div className="font-mono text-sm">
+                {lastUpdated.toLocaleTimeString()}
               </div>
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="mt-1 flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50"
+              >
+                <RefreshCw
+                  className={`w-3 h-3 ${loading ? "animate-spin" : ""}`}
+                />
+                {loading ? "Updating..." : "Refresh"}
+              </button>
             </div>
           </div>
         </div>
@@ -300,10 +322,10 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  Today's Liquidations
+                  Liquidation Risk
                 </p>
                 <p className="text-2xl font-bold text-red-600">
-                  {systemStats.todayLiquidations}
+                  {systemStats.liquidationLoans || 0}
                 </p>
               </div>
               <Zap className="h-8 w-8 text-red-600" />
@@ -397,89 +419,108 @@ const Dashboard = () => {
         {/* Live Loan Monitoring */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
           <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Live Loan Monitoring
-            </h3>
-            <p className="text-gray-600">
-              Real-time tracking of all active positions
-            </p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Live Loan Monitoring
+                </h3>
+                <p className="text-gray-600">
+                  Real-time tracking of all active positions
+                </p>
+              </div>
+              {loading && (
+                <div className="flex items-center gap-2 text-sm text-blue-600">
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Loading...
+                </div>
+              )}
+            </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="text-left p-4 font-medium text-gray-900">
-                    Borrower
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-900">
-                    Collateral
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-900">
-                    Borrowed
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-900">
-                    Health Factor
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-900">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {loans.map((loan) => (
-                  <tr
-                    key={loan.id}
-                    className="border-t border-gray-200 hover:bg-gray-50"
-                  >
-                    <td className="p-4">
-                      <div className="font-mono text-sm text-gray-900">
-                        {loan.borrower}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="font-semibold">
-                        {loan.collateral.amount.toFixed(4)}{" "}
-                        {loan.collateral.type}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        ${(loan.collateral.amount * 2000).toLocaleString()} USD
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="font-semibold">
-                        {loan.borrowed.amount} {loan.borrowed.type}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Debt: {(loan.rawDebt / 1e18).toFixed(2)} DAI
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div
-                        className={`font-bold ${getHealthFactorColor(
-                          loan.healthFactor
-                        )}`}
-                      >
-                        {loan.healthFactor.toFixed(2)}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div
-                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-medium ${getStatusColor(
-                          loan.status
-                        )}`}
-                      >
-                        {getStatusIcon(loan.status)}
-                        {loan.status === "healthy"
-                          ? "Healthy"
-                          : loan.status === "at-risk"
-                          ? "At Risk"
-                          : "Liquidation"}
-                      </div>
-                    </td>
+            {loans.length === 0 && !loading ? (
+              <div className="p-8 text-center text-gray-500">
+                No CDP data available. Check your GraphQL endpoint connection.
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="text-left p-4 font-medium text-gray-900">
+                      Borrower
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-900">
+                      Collateral
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-900">
+                      Borrowed
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-900">
+                      Health Factor
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-900">
+                      Status
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {loans.map((loan) => (
+                    <tr
+                      key={loan.id}
+                      className="border-t border-gray-200 hover:bg-gray-50"
+                    >
+                      <td className="p-4">
+                        <div className="font-mono text-sm text-gray-900">
+                          {loan.borrower}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="font-semibold">
+                          {loan.collateral.amount.toFixed(4)}{" "}
+                          {loan.collateral.type}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          ${(loan.collateral.amount * 2000).toLocaleString()}{" "}
+                          USD
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="font-semibold">
+                          {loan.borrowed.amount} {loan.borrowed.type}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Debt: {(loan.rawDebt / 1e18).toFixed(2)} DAI
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div
+                          className={`font-bold ${getHealthFactorColor(
+                            loan.healthFactor
+                          )}`}
+                        >
+                          {loan.healthFactor.toFixed(2)}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-medium ${getStatusColor(
+                            loan.status
+                          )}`}
+                        >
+                          {getStatusIcon(loan.status)}
+                          {loan.status === "healthy"
+                            ? "Healthy"
+                            : loan.status === "at-risk"
+                            ? "At Risk"
+                            : loan.status === "liquidation"
+                            ? "Liquidation"
+                            : "Closed"}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
