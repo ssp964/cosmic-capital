@@ -1,0 +1,35 @@
+
+ËÃdataSources:
+  - kind: ethereum
+    mapping:
+      abis:
+        - file:
+            /: /ipfs/Qme3Zki1Y6kqDvtLSSX5tJinhjXFN77LLVojxvxoXGAokH
+          name: Pool
+      apiVersion: 0.0.9
+      entities:
+        - CDP
+      eventHandlers:
+        - event: >-
+            Borrow(indexed address,address,indexed
+            address,uint256,uint8,uint256,indexed uint16)
+          handler: handleBorrow
+        - event: >-
+            LiquidationCall(indexed address,indexed address,indexed
+            address,uint256,uint256,address,bool)
+          handler: handleLiquidationCall
+      file:
+        /: /ipfs/Qma7M1J4JVaVQgSBZDDWvbHJJDzkhzXuggF7Q57HZzhDV2
+      kind: ethereum/events
+      language: wasm/assemblyscript
+    name: Pool
+    network: mainnet
+    source:
+      abi: Pool
+      address: '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2'
+      startBlock: 16291127
+schema:
+  file:
+    /: /ipfs/Qmdwhqmj8DWEp1E5nMQLbcuz99DAHzVJ7Sne8rgDjdaZSZ
+specVersion: 1.3.0
+Ã
