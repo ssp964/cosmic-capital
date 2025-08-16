@@ -1,8 +1,10 @@
 "use client";
 import React from "react";
 import { BackgroundLines } from "./ui/background-lines";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
+  const router = useRouter();
   // Scroll to FeaturesSectionDemo when "Learn" is clicked
   const handleLearnClick = () => {
     const section = document.getElementById("features-section");
@@ -10,6 +12,11 @@ const Hero = () => {
       section.scrollIntoView({ behavior: "smooth" });
     }
   };
+  // Redirect to dashboard page
+  const handleDashboardClick = () => {
+    router.push("/dashboard");
+  };
+
   return (
     <div>
       <BackgroundLines className="flex items-center justify-center w-full flex-col px-1">
@@ -28,7 +35,10 @@ const Hero = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/20 to-emerald-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
           </button>
 
-          <button className="group relative px-8 py-4 rounded-xl border-2 border-emerald-200/30 bg-gradient-to-br from-white/90 via-emerald-50/80 to-white/90 backdrop-blur-sm text-emerald-800 text-lg font-semibold hover:border-emerald-300/50 hover:bg-gradient-to-br hover:from-emerald-50/95 hover:via-white/90 hover:to-emerald-50/95 hover:-translate-y-2 transform transition-all duration-300 hover:shadow-[0_20px_40px_rgba(16,185,129,0.15)] active:scale-95 min-w-[140px] overflow-hidden">
+          <button
+            className="group relative px-8 py-4 rounded-xl border-2 border-emerald-200/30 bg-gradient-to-br from-white/90 via-emerald-50/80 to-white/90 backdrop-blur-sm text-emerald-800 text-lg font-semibold hover:border-emerald-300/50 hover:bg-gradient-to-br hover:from-emerald-50/95 hover:via-white/90 hover:to-emerald-50/95 hover:-translate-y-2 transform transition-all duration-300 hover:shadow-[0_20px_40px_rgba(16,185,129,0.15)] active:scale-95 min-w-[140px] overflow-hidden"
+            onClick={handleDashboardClick}
+          >
             <span className="relative z-10">Go to Dashboard</span>
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/20 to-emerald-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
           </button>

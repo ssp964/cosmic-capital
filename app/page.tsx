@@ -8,9 +8,7 @@ export default function Home() {
     <div>
       <NavbarDemo />
       <Hero></Hero>
-      <div id="features-section">
-        <FeaturesSectionDemo />
-      </div>
+      <FeaturesSectionDemo></FeaturesSectionDemo>
       <Footer></Footer>
     </div>
   );

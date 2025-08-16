@@ -11,6 +11,7 @@ import {
   MobileNavMenu,
 } from "./ui/resizablenavbar";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function NavbarDemo() {
   const navItems = [
@@ -30,12 +31,23 @@ export function NavbarDemo() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const router = useRouter();
+
+  // Handler for logo and Home button
+  const handleHomeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push("/");
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <div className="relative w-full mt-10">
       <Navbar>
         {/* Desktop Navigation */}
         <NavBody>
-          <NavbarLogo />
+          <div onClick={handleHomeClick} style={{ cursor: "pointer" }}>
+            <NavbarLogo />
+          </div>
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
             <NavbarButton variant="secondary">Login</NavbarButton>
