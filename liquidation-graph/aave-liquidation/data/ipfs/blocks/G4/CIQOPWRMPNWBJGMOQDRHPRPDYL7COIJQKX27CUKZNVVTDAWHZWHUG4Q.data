@@ -1,0 +1,9 @@
+
+“‹type CDP @entity(immutable: false) {
+  id: ID!
+  owner: Bytes!
+  collateral: BigDecimal!
+  debt: BigDecimal!
+  healthFactor: BigDecimal!
+}
+‹

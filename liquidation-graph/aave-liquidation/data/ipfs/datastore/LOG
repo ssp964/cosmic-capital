@@ -1,0 +1,75 @@
+=============== Aug 16, 2025 (UTC) ===============
+16:46:33.166625 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:46:33.194811 db@open opening
+16:46:33.243270 version@stat F·[] S·0B[] Sc·[]
+16:46:33.244199 db@janitor F·2 G·0
+16:46:33.244283 db@open done T·48.96475ms
+16:46:34.264655 db@close closing
+16:46:34.267888 db@close done T·3.237916ms
+=============== Aug 16, 2025 (UTC) ===============
+16:46:34.309548 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:46:34.318976 version@stat F·[] S·0B[] Sc·[]
+16:46:34.319051 db@open opening
+16:46:34.319697 journal@recovery F·1
+16:46:34.323846 journal@recovery recovering @1
+16:46:34.347365 memdb@flush created L0@2 N·12 S·1KiB "/pi..ZTI,v10":"/pr..crQ,v12"
+16:46:34.357380 version@stat F·[1] S·1KiB[1KiB] Sc·[0.25]
+16:46:34.394111 db@janitor F·3 G·0
+16:46:34.394160 db@open done T·75.074166ms
+16:46:34.461567 db@close closing
+16:46:34.465732 db@close done T·4.1595ms
+=============== Aug 16, 2025 (UTC) ===============
+16:46:34.760931 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:46:34.766675 version@stat F·[1] S·1KiB[1KiB] Sc·[0.25]
+16:46:34.766795 db@open opening
+16:46:34.769401 journal@recovery F·1
+16:46:34.783779 journal@recovery recovering @3
+16:46:34.796992 memdb@flush created L0@5 N·6 S·1KiB "/F5..VZA,v19":"/pi..rty,v14"
+16:46:34.807866 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+16:46:34.824547 db@janitor F·4 G·0
+16:46:34.827025 db@open done T·60.200125ms
+16:46:34.849938 db@close closing
+16:46:34.850849 db@close done T·897.25µs
+=============== Aug 16, 2025 (UTC) ===============
+16:46:35.016848 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:46:35.018441 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+16:46:35.018603 db@open opening
+16:46:35.019767 journal@recovery F·1
+16:46:35.020404 journal@recovery recovering @6
+16:46:35.030745 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+16:46:35.036749 db@janitor F·4 G·0
+16:46:35.036828 db@open done T·18.012ms
+16:46:35.069592 db@close closing
+16:46:35.088101 db@close done T·18.510875ms
+=============== Aug 16, 2025 (UTC) ===============
+16:46:35.225933 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:46:35.238328 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+16:46:35.241493 db@open opening
+16:46:35.244606 journal@recovery F·1
+16:46:35.245885 journal@recovery recovering @8
+16:46:35.255599 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+16:46:35.295269 db@janitor F·4 G·0
+16:46:35.308911 db@open done T·67.225417ms
+16:55:58.254181 db@close closing
+16:55:58.261068 db@close done T·6.593584ms
+=============== Aug 16, 2025 (UTC) ===============
+16:56:14.446969 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:56:14.450052 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+16:56:14.450145 db@open opening
+16:56:14.450793 journal@recovery F·1
+16:56:14.452601 journal@recovery recovering @10
+16:56:14.463695 memdb@flush created L0@12 N·40 S·4KiB "/F5..VZA,v30":"/pr..VOI,v33"
+16:56:14.465585 version@stat F·[3] S·7KiB[7KiB] Sc·[0.75]
+16:56:14.479745 db@janitor F·5 G·0
+16:56:14.479808 db@open done T·29.553667ms
+16:56:30.221256 db@close closing
+16:56:30.223358 db@close done T·2.11025ms
+=============== Aug 16, 2025 (UTC) ===============
+16:56:32.005074 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:56:32.007802 version@stat F·[3] S·7KiB[7KiB] Sc·[0.75]
+16:56:32.007881 db@open opening
+16:56:32.008291 journal@recovery F·1
+16:56:32.008619 journal@recovery recovering @13
+16:56:32.013099 version@stat F·[3] S·7KiB[7KiB] Sc·[0.75]
+16:56:32.019782 db@janitor F·5 G·0
+16:56:32.019940 db@open done T·12.007208ms
