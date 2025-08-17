@@ -1,0 +1,17 @@
+chains:
+  flowtestnet:
+    name: flowtestnet
+    chainId: 545
+    rpcUrl: https://testnet.evm.nodes.onflow.org
+  basesepolia:
+    name: basesepolia
+    chainId: 84532
+    rpcUrl: https://sepolia.base.org
+
+warpRoutes:
+  - base:
+      chainName: flowtestnet
+      type: collateral
+      address: "0xe0fd0c2A4C2E59a479AqB0cf44244E355c508766"
+    synthetics:
+      - chainName: basesepolia
