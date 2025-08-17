@@ -1,0 +1,21 @@
+{
+  "networks": {
+    "emulator": "127.0.0.1:3569",
+    "mainnet": "access.mainnet.nodes.onflow.org:9000",
+    "testnet": "access.devnet.nodes.onflow.org:9000"
+  },
+  "accounts": {
+    "omkar": {
+      "address": "0x087c5036690ea20b",
+      "key": "f7fcfa490ccd80bccb0bd4f7a82a07345e1edc0808966a22f0b74cf2fcefc782"
+    }
+  },
+  "contracts": {
+    "Bank": "./contracts/Bank.cdc"
+  },
+  "deployments": {
+    "testnet": {
+      "omkar": ["Bank"]
+    }
+  }
+}
