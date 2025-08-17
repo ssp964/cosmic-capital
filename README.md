@@ -1,4 +1,4 @@
-CosmicCapital# 🏦 Bank Contract – Flow Testnet
+# Bank Contract – Flow Testnet
 
 This repository contains a simple **Bank smart contract** written in **Cadence**.  
 The contract allows any Flow account to:
@@ -35,3 +35,7 @@ Contract Address: 0x087c5036690ea20b
 Network: Flow Testnet
 Deployed in Block: 815d94efac6dc6cc8e8b75831ec4bb5116bb2bfc4c2f3a59d45561ffa202a8af
 
+
+Link: https://testnet.flowscan.io/account/0x087c5036690ea20b 
+
+https://testnet.flowscan.io/tx/815d94efac6dc6cc8e8b75831ec4bb5116bb2bfc4c2f3a59d45561ffa202a8af
