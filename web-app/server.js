@@ -22,6 +22,7 @@ app.use((req, res, next) => {
 });
 
 // Combined endpoint: deploy and immediately send (with streaming logs)
+// Combined endpoint: deploy and immediately send (with streaming logs, using HYP_KEY)
 app.post('/deploy-and-send', (req, res) => {
     const {
       configPath,
@@ -36,36 +37,26 @@ app.post('/deploy-and-send', (req, res) => {
       return res.status(400).json({ error: 'Missing required parameters.' });
     }
   
-    const baseKey   = process.env.HYP_BASESEPOLIA_PRIVATE_KEY;
-    const holeskyKey = process.env.HYP_HOLESKY_PRIVATE_KEY;
-  
-    if (!baseKey || !holeskyKey) {
-      return res.status(500).json({ error: 'Private keys not found in environment variables.' });
+    // Single Hyperlane private key from .env
+    const hyperlaneKey = process.env.HYP_KEY;
+    if (!hyperlaneKey) {
+      return res.status(500).json({ error: 'HYP_KEY not found in environment variables.' });
     }
   
     console.log('[+] Starting deployment (stream mode)...');
   
-    // Spawn the deployment process so we can stream stdout
+    // Spawn the deployment process
     const deployProc = spawn('hyperlane', [
-        'warp', 'deploy',
-        '--config', configPath,
-        '--yes'
-      ], {
-        env: {
-          ...process.env,
-          HYP_BASESEPOLIA_PRIVATE_KEY: baseKey,
-          HYP_HOLESKY_PRIVATE_KEY: holeskyKey
-        },
-        stdio: ['pipe', 'pipe', 'pipe']
-      });
-      
-      // Auto-answer "no" to the “Do you want to use an API key…?” prompt
-      deployProc.stdin.write('no\n');
-
-      
-      
+      'warp', 'deploy',
+      '--config', configPath,
+      '--yes'
+    ], {
+      env: {
+        ...process.env,    // includes HYP_KEY from dotenv
+      },
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
   
-    // Stream output from deploy command
     deployProc.stdout.on('data', (data) => {
       console.log(`[deploy] ${data.toString()}`);
     });
@@ -83,7 +74,6 @@ app.post('/deploy-and-send', (req, res) => {
   
       console.log('✅ Deployment completed, starting send...');
   
-      // Spawn the send command
       const sendProc = spawn('hyperlane', [
         'warp', 'send',
         '--from', from,
@@ -92,7 +82,9 @@ app.post('/deploy-and-send', (req, res) => {
         '--recipient', recipient,
         '--amount', amount,
         '--relay'
-      ]);
+      ], {
+        env: { ...process.env }
+      });
   
       sendProc.stdout.on('data', (data) => {
         console.log(`[send] ${data.toString()}`);
@@ -111,6 +103,7 @@ app.post('/deploy-and-send', (req, res) => {
       });
     });
   });
+  
 
 app.listen(port, () => {
   console.log(`Local Hyperlane server listening at http://localhost:${port}`);
