@@ -1,2 +1,0 @@
-const PoolConfiguratorArtifact = require('@aave/core-v3/artifacts/contracts/protocol/configuration/PoolConfigurator.sol/PoolConfigurator.json');
-console.log(JSON.stringify(PoolConfiguratorArtifact.abi, null, 2));
